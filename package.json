@@ -1,16 +1,14 @@
 {
   "name": "react-native-image-resizer",
   "version": "1.0.0",
-  "description": "",
+  "description": "Resizes images. General purpose is to make image thumbnail.",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "scripts": {},
   "keywords": [
     "react-native"
   ],
-  "author": "",
-  "license": "",
+  "author": "Igor Kling <klingigor@gmail.com>",
+  "license": "MIT",
   "devDependencies": {
     "react-native": "0.59.10"
   }
