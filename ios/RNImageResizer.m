@@ -18,37 +18,37 @@ bool saveImage(NSString* fullPath, UIImage* image, NSString* format, float quali
     return [ [NSFileManager defaultManager] createFileAtPath:fullPath contents:data attributes:nil];
 }
 
-NSString* generateFilePath(NSString* ext)
-{
-//    NSString* directory;
+// NSString* generateFilePath(NSString* ext)
+// {
+// //    NSString* directory;
 
-//    if ([outputPath length] == 0) {
-        NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-        NSString* directory = [paths firstObject];
-//    }
-//    else {
-//        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-//        NSString *documentsDirectory = [paths objectAtIndex:0];
-//        if ([outputPath hasPrefix:documentsDirectory]) {
-//            directory = outputPath;
-//        } else {
-//            directory = [documentsDirectory stringByAppendingPathComponent:outputPath];
-//        }
-//
-//        NSError *error;
-//        [[NSFileManager defaultManager] createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:&error];
-//        if (error) {
-//            NSLog(@"Error creating documents subdirectory: %@", error);
-//            @throw [NSException exceptionWithName:@"InvalidPathException" reason:[NSString stringWithFormat:@"Error creating documents subdirectory: %@", error] userInfo:nil];
-//        }
-//    }
+// //    if ([outputPath length] == 0) {
+//         NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+//         NSString* directory = [paths firstObject];
+// //    }
+// //    else {
+// //        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+// //        NSString *documentsDirectory = [paths objectAtIndex:0];
+// //        if ([outputPath hasPrefix:documentsDirectory]) {
+// //            directory = outputPath;
+// //        } else {
+// //            directory = [documentsDirectory stringByAppendingPathComponent:outputPath];
+// //        }
+// //
+// //        NSError *error;
+// //        [[NSFileManager defaultManager] createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:&error];
+// //        if (error) {
+// //            NSLog(@"Error creating documents subdirectory: %@", error);
+// //            @throw [NSException exceptionWithName:@"InvalidPathException" reason:[NSString stringWithFormat:@"Error creating documents subdirectory: %@", error] userInfo:nil];
+// //        }
+// //    }
 
-    NSString* name = [[NSUUID UUID] UUIDString];
-    NSString* fullName = [NSString stringWithFormat:@"%@.%@", name, ext];
-    NSString* fullPath = [directory stringByAppendingPathComponent:fullName];
+//     NSString* name = [[NSUUID UUID] UUIDString];
+//     NSString* fullName = [NSString stringWithFormat:@"%@.%@", name, ext];
+//     NSString* fullPath = [directory stringByAppendingPathComponent:fullName];
 
-    return fullPath;
-}
+//     return fullPath;
+// }
 
 @implementation RNImageResizer
 
@@ -62,6 +62,7 @@ RCT_EXPORT_MODULE();
 }
 
 RCT_EXPORT_METHOD(createResizedImage:(NSString *)path
+                  outputPath:(NSString *)path
                   width:(float)width
                   height:(float)height
                   format:(NSString *)format
@@ -78,14 +79,14 @@ RCT_EXPORT_METHOD(createResizedImage:(NSString *)path
   }
 
 
-  NSString* fullPath;
-  @try {
-    fullPath = generateFilePath(extension);
-    NSLog(@"GENERATED PATH: %@", fullPath);
-  } @catch (NSException *exception) {
-    reject(@"", exception.reason, NULL);
-    return;
-  }
+  // NSString* fullPath;
+  // @try {
+  //   fullPath = generateFilePath(extension);
+  //   NSLog(@"GENERATED PATH: %@", fullPath);
+  // } @catch (NSException *exception) {
+  //   reject(@"", exception.reason, NULL);
+  //   return;
+  // }
 
   [_bridge.imageLoader loadImageWithURLRequest:[RCTConvert NSURLRequest:path] callback:^(NSError *error, UIImage *image) {
     if (error || image == nil) {
@@ -115,12 +116,16 @@ RCT_EXPORT_METHOD(createResizedImage:(NSString *)path
       return;
     }
 
-    if (!saveImage(fullPath, scaledImage, format, quality)) {
+    if (!saveImage(outputPath, scaledImage, format, quality)) {
       reject(@"",@"Can't save the image. Check your compression format and your output path.", NULL);
       return;
     }
 
-    resolve(fullPath);
+  NSDictionary *response = @{
+    @"uri": outputPath,
+  };
+
+    resolve(response);
   }];
 }
 
