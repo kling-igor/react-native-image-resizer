@@ -18,38 +18,6 @@ bool saveImage(NSString* fullPath, UIImage* image, NSString* format, float quali
     return [ [NSFileManager defaultManager] createFileAtPath:fullPath contents:data attributes:nil];
 }
 
-// NSString* generateFilePath(NSString* ext)
-// {
-// //    NSString* directory;
-
-// //    if ([outputPath length] == 0) {
-//         NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-//         NSString* directory = [paths firstObject];
-// //    }
-// //    else {
-// //        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-// //        NSString *documentsDirectory = [paths objectAtIndex:0];
-// //        if ([outputPath hasPrefix:documentsDirectory]) {
-// //            directory = outputPath;
-// //        } else {
-// //            directory = [documentsDirectory stringByAppendingPathComponent:outputPath];
-// //        }
-// //
-// //        NSError *error;
-// //        [[NSFileManager defaultManager] createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:&error];
-// //        if (error) {
-// //            NSLog(@"Error creating documents subdirectory: %@", error);
-// //            @throw [NSException exceptionWithName:@"InvalidPathException" reason:[NSString stringWithFormat:@"Error creating documents subdirectory: %@", error] userInfo:nil];
-// //        }
-// //    }
-
-//     NSString* name = [[NSUUID UUID] UUIDString];
-//     NSString* fullName = [NSString stringWithFormat:@"%@.%@", name, ext];
-//     NSString* fullPath = [directory stringByAppendingPathComponent:fullName];
-
-//     return fullPath;
-// }
-
 @implementation RNImageResizer
 
 @synthesize bridge = _bridge;
@@ -62,7 +30,7 @@ RCT_EXPORT_MODULE();
 }
 
 RCT_EXPORT_METHOD(createResizedImage:(NSString *)path
-                  outputPath:(NSString *)path
+                  outputPath:(NSString *)outputPath
                   width:(float)width
                   height:(float)height
                   format:(NSString *)format
@@ -77,16 +45,6 @@ RCT_EXPORT_METHOD(createResizedImage:(NSString *)path
   if ([format isEqualToString:@"PNG"]) {
       extension = @"png";
   }
-
-
-  // NSString* fullPath;
-  // @try {
-  //   fullPath = generateFilePath(extension);
-  //   NSLog(@"GENERATED PATH: %@", fullPath);
-  // } @catch (NSException *exception) {
-  //   reject(@"", exception.reason, NULL);
-  //   return;
-  // }
 
   [_bridge.imageLoader loadImageWithURLRequest:[RCTConvert NSURLRequest:path] callback:^(NSError *error, UIImage *image) {
     if (error || image == nil) {
@@ -104,8 +62,6 @@ RCT_EXPORT_METHOD(createResizedImage:(NSString *)path
       }
     }
 
-//    UIImage* scaledImage = [image scaleToSize:newSize];
-
     UIGraphicsBeginImageContext(newSize);
     [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
     UIImage* scaledImage = UIGraphicsGetImageFromCurrentImageContext();
@@ -121,11 +77,9 @@ RCT_EXPORT_METHOD(createResizedImage:(NSString *)path
       return;
     }
 
-  NSDictionary *response = @{
-    @"uri": outputPath,
-  };
-
-    resolve(response);
+    resolve(@{
+      @"uri": outputPath,
+    });
   }];
 }
 
